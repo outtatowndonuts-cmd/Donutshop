@@ -1,0 +1,218 @@
+You are a senior full-stack engineer.
+
+Your job is to build a production-ready React storefront by using the UI prototype located in the repository.
+
+IMPORTANT
+
+The UI prototype is located at:
+
+/ui-prototype
+
+This folder contains a DeepSite-generated UI.
+
+Your task is to use it as the design reference and recreate a production application.
+
+DO NOT modify the prototype directly.
+
+Instead:
+
+Create a new application at:
+
+/storefront
+
+Copy the UI architecture and components from /ui-prototype and convert them into a clean production implementation.
+
+--------------------------------------------------
+
+STACK
+
+Frontend
+
+React
+TypeScript
+Vite
+TailwindCSS
+React Router
+
+Backend
+
+Express API Gateway
+CraftPlan backend server
+Stripe Checkout
+
+--------------------------------------------------
+
+BACKEND API
+
+All frontend requests must go through the Express gateway.
+
+Base API path:
+
+/api
+
+Expected endpoints:
+
+GET /api/products
+
+GET /api/products/:id
+
+POST /api/orders
+
+POST /api/checkout
+
+GET /api/orders/:id
+
+The Express server handles Stripe and CraftPlan integration.
+
+Do NOT implement backend logic.
+
+--------------------------------------------------
+
+APPLICATION STRUCTURE
+
+Create the following folder structure:
+
+storefront/
+
+src/
+
+api/
+client.ts
+
+components/
+
+pages/
+
+hooks/
+
+context/
+
+types/
+
+styles/
+
+--------------------------------------------------
+
+API CLIENT
+
+Create:
+
+src/api/client.ts
+
+Implement fetch wrappers for:
+
+getProducts()
+
+getProductById()
+
+createOrder()
+
+createCheckout()
+
+getOrder()
+
+--------------------------------------------------
+
+STATE MANAGEMENT
+
+Implement:
+
+CartContext
+
+useCart hook
+
+Cart must persist using localStorage.
+
+--------------------------------------------------
+
+ROUTES
+
+/
+
+Home page
+
+/about
+
+Brand story
+
+/order
+
+Product selection
+
+/cart
+
+Cart view
+
+/checkout
+
+Checkout page
+
+/confirmation/:orderId
+
+Order confirmation page
+
+--------------------------------------------------
+
+CHECKOUT FLOW
+
+1. Customer selects donuts
+2. Adds to cart
+3. Proceeds to checkout
+4. POST /api/checkout
+5. Server returns Stripe Checkout URL
+6. Redirect browser to Stripe
+
+--------------------------------------------------
+
+CODE QUALITY
+
+You must:
+
+Convert prototype code into clean modular components
+
+Remove duplicated logic
+
+Add TypeScript types
+
+Add loading states
+
+Add error handling
+
+Use functional components
+
+Use hooks
+
+--------------------------------------------------
+
+DESIGN RULES
+
+Follow the brand design used in the UI prototype.
+
+Brand identity:
+
+Outta Town Donuts
+at New Weird America
+
+Style:
+
+Minimal
+Rustic
+Farmstand aesthetic
+Warm parchment background
+Deep brown typography
+Barn red accents
+
+Avoid bright bakery colors.
+
+--------------------------------------------------
+
+OBJECTIVE
+
+Transform the UI prototype into a production-ready React storefront that connects to the Express API gateway.
+
+The final application must compile, run, and support:
+
+menu browsing
+cart management
+checkout
+order confirmation

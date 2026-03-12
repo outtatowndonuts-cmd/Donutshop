@@ -1,9 +1,9 @@
 const axios = require('axios');
+const debug = require('../middleware/debugLogger');
 
 const craftplanClient = axios.create({
   baseURL: process.env.CRAFTPLAN_BASE_URL || 'http://localhost:4000',
   timeout: 10000,
-  headers: { 'Content-Type': 'application/json' },
 });
 
 /**
@@ -11,28 +11,42 @@ const craftplanClient = axios.create({
  * Forwards the request to Craftplan and streams the response back.
  */
 async function proxyRequest(method, path, { data, params, headers = {} } = {}) {
-  // Forward the Authorization header if present
-  const forwardHeaders = {};
-  if (headers['authorization']) {
-    forwardHeaders['Authorization'] = headers['authorization'];
+  debug('Proxy request', { method, path, data, params, headers });
+  try {
+    // Always send Accept header required by Craftplan API
+    const mergedHeaders = {
+      Accept: 'application/vnd.api+json',
+      ...headers,
+    };
+    // Only set Content-Type for requests with a body
+    if (["POST", "PUT", "PATCH"].includes(method.toUpperCase())) {
+      mergedHeaders['Content-Type'] = 'application/json';
+    }
+    const response = await craftplanClient.request({
+      method,
+      url: path,
+      data,
+      params,
+      headers: mergedHeaders,
+    });
+    debug('Proxy response', { status: response.status, statusText: response.statusText, url: response.config.url, data: response.data });
+    return response.data;
+  } catch (err) {
+    if (err.response) {
+      debug('Proxy error response', { status: err.response.status, statusText: err.response.statusText, url: err.config.url, data: err.response.data });
+    } else {
+      debug('Proxy error', err);
+    }
+    throw err;
   }
-
-  const response = await craftplanClient.request({
-    method,
-    url: path,
-    data,
-    params,
-    headers: forwardHeaders,
-  });
-
-  return response.data;
 }
 
 // ── Products ─────────────────────────────────────────────────────────────────
 
 async function listProducts(req, res, next) {
+  debug('listProducts called', { query: req.query });
   try {
-    const data = await proxyRequest('GET', '/api/products', {
+    const data = await proxyRequest('GET', '/api/json/products', {
       params: req.query,
       headers: req.headers,
     });
@@ -43,8 +57,9 @@ async function listProducts(req, res, next) {
 }
 
 async function getProduct(req, res, next) {
+  debug('getProduct called', { id: req.params.id });
   try {
-    const data = await proxyRequest('GET', `/api/products/${req.params.id}`, {
+    const data = await proxyRequest('GET', `/api/json/products/${req.params.id}`, {
       headers: req.headers,
     });
     return res.json(data);
@@ -56,8 +71,9 @@ async function getProduct(req, res, next) {
 // ── Orders ────────────────────────────────────────────────────────────────────
 
 async function listOrders(req, res, next) {
+  debug('listOrders called', { query: req.query });
   try {
-    const data = await proxyRequest('GET', '/api/orders', {
+    const data = await proxyRequest('GET', '/api/json/orders', {
       params: req.query,
       headers: req.headers,
     });
@@ -68,8 +84,9 @@ async function listOrders(req, res, next) {
 }
 
 async function getOrder(req, res, next) {
+  debug('getOrder called', { id: req.params.id });
   try {
-    const data = await proxyRequest('GET', `/api/orders/${req.params.id}`, {
+    const data = await proxyRequest('GET', `/api/json/orders/${req.params.id}`, {
       headers: req.headers,
     });
     return res.json(data);
@@ -79,8 +96,9 @@ async function getOrder(req, res, next) {
 }
 
 async function createOrder(req, res, next) {
+  debug('createOrder called', { body: req.body });
   try {
-    const data = await proxyRequest('POST', '/api/orders', {
+    const data = await proxyRequest('POST', '/api/json/orders', {
       data: req.body,
       headers: req.headers,
     });
@@ -91,8 +109,9 @@ async function createOrder(req, res, next) {
 }
 
 async function updateOrder(req, res, next) {
+  debug('updateOrder called', { id: req.params.id, body: req.body });
   try {
-    const data = await proxyRequest('PUT', `/api/orders/${req.params.id}`, {
+    const data = await proxyRequest('PUT', `/api/json/orders/${req.params.id}`, {
       data: req.body,
       headers: req.headers,
     });
@@ -105,8 +124,9 @@ async function updateOrder(req, res, next) {
 // ── Customers ─────────────────────────────────────────────────────────────────
 
 async function getCustomer(req, res, next) {
+  debug('getCustomer called', { id: req.params.id });
   try {
-    const data = await proxyRequest('GET', `/api/customers/${req.params.id}`, {
+    const data = await proxyRequest('GET', `/api/json/customers/${req.params.id}`, {
       headers: req.headers,
     });
     return res.json(data);

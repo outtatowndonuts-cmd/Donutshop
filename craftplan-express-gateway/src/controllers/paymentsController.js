@@ -1,4 +1,5 @@
 const Stripe = require('stripe');
+const debug = require('../middleware/debugLogger');
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 if (!stripeSecretKey) {
@@ -13,6 +14,7 @@ const stripe = Stripe(stripeSecretKey);
  * Body: { amount: number (cents), currency?: string, metadata?: object }
  */
 async function createPaymentIntent(req, res, next) {
+  debug('createPaymentIntent called', { body: req.body });
   try {
     const { amount, currency = 'usd', metadata = {} } = req.body;
 
@@ -34,6 +36,7 @@ async function createPaymentIntent(req, res, next) {
       paymentIntentId: paymentIntent.id,
     });
   } catch (err) {
+    debug('createPaymentIntent error', { error: err.message });
     return next(err);
   }
 }
@@ -44,10 +47,12 @@ async function createPaymentIntent(req, res, next) {
  * Retrieve the status of an existing payment intent.
  */
 async function getPaymentIntent(req, res, next) {
+  debug('getPaymentIntent called', { id: req.params.id });
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(req.params.id);
     return res.json({ status: paymentIntent.status, paymentIntent });
   } catch (err) {
+    debug('getPaymentIntent error', { error: err.message });
     return next(err);
   }
 }
@@ -59,6 +64,7 @@ async function getPaymentIntent(req, res, next) {
  * The route must receive the raw request body (not parsed JSON).
  */
 function handleWebhook(req, res, next) {
+  debug('handleWebhook called', { headers: req.headers });
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -77,7 +83,9 @@ function handleWebhook(req, res, next) {
       // Fallback for local development without a webhook secret
       event = JSON.parse(req.body.toString());
     }
+    debug('Webhook event received', event);
   } catch (err) {
+    debug('Webhook signature verification failed', { error: err.message });
     console.error(`[webhook] signature verification failed: ${err.message}`);
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
@@ -85,24 +93,29 @@ function handleWebhook(req, res, next) {
   try {
     switch (event.type) {
       case 'payment_intent.succeeded':
+        debug('payment_intent.succeeded', event.data.object);
         console.log(`[webhook] payment_intent.succeeded: ${event.data.object.id}`);
         // TODO: fulfil order in Craftplan backend
         break;
 
       case 'payment_intent.payment_failed':
+        debug('payment_intent.payment_failed', event.data.object);
         console.warn(`[webhook] payment_intent.payment_failed: ${event.data.object.id}`);
         break;
 
       case 'charge.refunded':
+        debug('charge.refunded', event.data.object);
         console.log(`[webhook] charge.refunded: ${event.data.object.id}`);
         break;
 
       default:
+        debug('Unhandled event type', { type: event.type });
         console.log(`[webhook] unhandled event type: ${event.type}`);
     }
 
     return res.json({ received: true });
   } catch (err) {
+    debug('Webhook handler error', { error: err.message });
     return next(err);
   }
 }
