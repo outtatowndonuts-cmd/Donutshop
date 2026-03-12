@@ -36,7 +36,7 @@ An e-commerce platform for custom donut orders, featuring a modern React + TypeS
 ### 1. Clone & Install
 
 ```bash
-git clone <this-repo-url>
+git clone <(https://github.com/outtatowndonuts-cmd/Donutshop/tree/Dev)>
 cd Donutshop-1
 npm install
 ```
