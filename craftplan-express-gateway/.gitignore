@@ -1,2 +1,20 @@
+# Node
 node_modules/
+
+# Env
 .env
+.env.*
+
+# Logs
+logs/
+*.log
+coverage/
+
+# Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
