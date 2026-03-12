@@ -2,8 +2,16 @@ import { useState } from 'react';
 import CategoryFilter from '../components/CategoryFilter';
 import ProductGrid from '../components/ProductGrid';
 import CartDrawer from '../components/CartDrawer';
+import type { CartItem } from '../App';
 
-export default function HomePage({ cartOpen, setCartOpen }: { cartOpen: boolean; setCartOpen: (open: boolean) => void }) {
+interface HomePageProps {
+  cart: CartItem[];
+  addToCart: (product: { id: string; name: string; price: number }) => void;
+  removeFromCart: (id: string) => void;
+  updateCartQty: (id: string, newQty: number) => void;
+}
+
+export default function HomePage({ cart, addToCart, removeFromCart, updateCartQty }: HomePageProps) {
   const [category, setCategory] = useState('all');
 
   return (
@@ -38,11 +46,8 @@ export default function HomePage({ cartOpen, setCartOpen }: { cartOpen: boolean;
       {/* Menu Section */}
       <main id="menu" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <CategoryFilter selected={category} onSelect={setCategory} />
-        <ProductGrid category={category} />
+        <ProductGrid category={category} addToCart={addToCart} />
       </main>
-
-      {/* Cart Drawer */}
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </div>
   );
 }

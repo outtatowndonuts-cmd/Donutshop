@@ -8,7 +8,7 @@ const navLinks = [
   { to: '/tracking', label: 'Track Order' },
 ];
 
-export default function Navbar({ onCartOpen }: { onCartOpen: () => void }) {
+export default function Navbar({ onCartOpen, cart }: { onCartOpen: () => void, cart: { quantity: number }[] }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -46,7 +46,7 @@ export default function Navbar({ onCartOpen }: { onCartOpen: () => void }) {
               onClick={onCartOpen}
             >
               <ShoppingBag className="w-6 h-6 text-soft-brown-dark" />
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-pastel-pink text-soft-brown-dark text-xs font-bold rounded-full flex items-center justify-center">0</span>
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-pastel-pink text-soft-brown-dark text-xs font-bold rounded-full flex items-center justify-center">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>
             </button>
             <button
               className="md:hidden p-2 rounded-lg hover:bg-warm-cream transition-colors"

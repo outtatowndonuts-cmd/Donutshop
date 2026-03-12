@@ -1,6 +1,11 @@
 {
-  "dependencies": {
-    "lucide-react": "^0.577.0",
-    "react-router-dom": "^7.13.1"
+  "scripts": {
+    "dev": "concurrently \"npm --prefix craftplan-express-gateway run dev\" \"npm --prefix storefront run dev\"",
+    "start": "concurrently \"npm --prefix craftplan-express-gateway start\" \"npm --prefix storefront start\"",
+    "test": "npm --prefix craftplan-express-gateway test && npm --prefix storefront test"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "concurrently": "^8.2.2"
   }
 }

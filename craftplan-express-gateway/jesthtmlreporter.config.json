@@ -1,0 +1,6 @@
+{
+  "pageTitle": "Craftplan Express Gateway Test Report",
+  "outputPath": "test-report.html",
+  "includeFailureMsg": true,
+  "includeConsoleLog": true
+}
